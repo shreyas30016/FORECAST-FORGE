@@ -1,0 +1,51 @@
+# Python virtual environment
+.venv/
+env/
+venv/
+
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Testing and linting caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Environment and local secret files
+.env
+.env.local
+
+# Data storage
+data/
+*.parquet
+.model_cache/
+.trace_cache/
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Antigravity & Scratch files
+.agents/
+Forcast_Forge_AI_MD/
+scratch/
+scripts/
+
+# Frontend
+ui/node_modules/
+ui/.next/
+ui/out/
+ui/build/
+ui/.env.local
+ui/.env.development.local
+ui/.env.test.local
+ui/.env.production.local

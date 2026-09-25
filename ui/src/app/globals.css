@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@theme {
+  /* 01_NEW_UI_DESIGN_SYSTEM.md Tokens */
+  --color-background: #06111F; /* Deep Cinematic Midnight Blue */
+  --color-background-alt: #091728;
+  --color-panel: #0D1B2A; /* Rich Dark Surface */
+  --color-panel-hover: #13253A; /* Elevated Hover Surface */
+  --color-panel-elevated: #13253A;
+  --color-panel-glass: rgba(13, 27, 42, 0.78);
+  
+  --color-text-primary: #F8FAFC; /* Slate 50 */
+  --color-text-secondary: #94A3B8; /* Slate 400 */
+  --color-text-muted: #64748B; /* Slate 500 */
+  
+  --color-border-subtle: #1E3550; /* Subtle Deep Border */
+  --color-border-focus: #34D399; /* Emerald Focus */
+  --color-border-glass: rgba(255, 255, 255, 0.08);
+
+  /* Model Semantic Tokens */
+  --color-ifs: #38BDF8; /* Sky Blue (ECMWF IFS) */
+  --color-gfs: #FB923C; /* Warm Orange (NOAA GFS) */
+  --color-aifs: #A78BFA; /* AI Violet (ECMWF AIFS) */
+  --color-ensemble: #34D399; /* Vibrant Intelligence Emerald */
+  --color-ensemble-glow: rgba(52, 211, 153, 0.25);
+
+  /* Weather Condition Accents */
+  --color-weather-sun: #FBBF24;
+  --color-weather-rain: #60A5FA;
+  --color-weather-wind: #67E8F9;
+  --color-weather-storm: #94A3B8;
+  --color-weather-fog: #CBD5E1;
+
+  /* Operational Status Colors */
+  --color-status-available: #34D399;
+  --color-status-partial: #FBBF24;
+  --color-status-unavailable: #F87171;
+
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    font-family: var(--font-sans);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #06111F;
+}
+::-webkit-scrollbar-thumb {
+  background: #1E3550;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Glassmorphism & Cinematic Surface Utilities */
+.glass-panel {
+  background: rgba(13, 27, 42, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-panel-elevated {
+  background: rgba(19, 37, 58, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
+}
+
+.glow-ensemble {
+  box-shadow: 0 0 35px -5px rgba(52, 211, 153, 0.25);
+}
+
+.glow-sun {
+  box-shadow: 0 0 40px -5px rgba(251, 191, 36, 0.25);
+}
+
+.glow-rain {
+  box-shadow: 0 0 35px -5px rgba(96, 165, 250, 0.25);
+}
+
+/* Scientific Leaflet HUD Overrides */
+.leaflet-container {
+  background-color: #06111F !important;
+  font-family: var(--font-mono) !important;
+}
+
+.leaflet-bar {
+  border: 1px solid #1E3550 !important;
+  box-shadow: 0 8px 16px -2px rgba(0, 0, 0, 0.5) !important;
+  border-radius: 4px !important;
+  overflow: hidden;
+  backdrop-filter: blur(12px) !important;
+}
+
+.leaflet-bar a {
+  background-color: rgba(13, 27, 42, 0.9) !important;
+  color: #F8FAFC !important;
+  border-bottom: 1px solid #1E3550 !important;
+  transition: all 150ms ease;
+}
+
+.leaflet-bar a:hover {
+  background-color: #13253A !important;
+  color: #34D399 !important;
+}
+
+.leaflet-bar a:last-child {
+  border-bottom: none !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(6, 17, 31, 0.88) !important;
+  color: #94A3B8 !important;
+  font-size: 10px !important;
+  font-family: var(--font-mono) !important;
+  border-top-left-radius: 4px;
+  border-top: 1px solid #1E3550;
+  border-left: 1px solid #1E3550;
+  backdrop-filter: blur(8px);
+}
+
+.leaflet-control-attribution a {
+  color: #34D399 !important;
+  text-decoration: none;
+}
+
+.leaflet-control-attribution a:hover {
+  text-decoration: underline;
+}
+
+/* OpenStreetMap Standard Raster Tile Dark Workstation Filter */
+.osm-tiles {
+  filter: invert(100%) hue-rotate(180deg) brightness(75%) contrast(92%) grayscale(25%);
+}
+
+/* Scientific Leaflet Tooltip Styling */
+.scientific-map-tooltip {
+  background: rgba(13, 27, 42, 0.95) !important;
+  color: #F8FAFC !important;
+  border: 1px solid #1E3550 !important;
+  border-radius: 4px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  box-shadow: 0 14px 28px -4px rgba(0, 0, 0, 0.7) !important;
+  padding: 8px 12px !important;
+  backdrop-filter: blur(12px);
+}
+
+.leaflet-tooltip-top:before {
+  border-top-color: #1E3550 !important;
+}
+
+.leaflet-tooltip-bottom:before {
+  border-bottom-color: #1E3550 !important;
+}
+
+/* Smooth motion utility classes */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
