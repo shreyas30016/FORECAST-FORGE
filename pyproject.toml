@@ -54,12 +54,13 @@ select = [
 ]
 ignore = ["B008"]
 
+[tool.ruff.lint.per-file-ignores]
+# Scripts contain long print/format strings for tabular terminal output — line length is intentional
+"scripts/*.py" = ["E501"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
-[dependency-groups]
-dev = [
-    "pytest>=9.1.1",
-    "ruff>=0.16.8",
-]
+# Development dependencies are declared above under [project.optional-dependencies].dev
+# and installed via: uv sync --extra dev

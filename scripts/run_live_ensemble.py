@@ -51,7 +51,7 @@ async def main():
             # Missing or null
             forecasts.append(
                 ModelForecast(
-                    model=model_name, value=None, is_valid=False, status="UNAVAILABLE/INVALID_DATA"
+                    model=model_name, value=None, is_valid=False, status="NO_VALID_DATA"
                 )
             )
 

@@ -4,9 +4,15 @@ An ensemble numerical weather prediction (NWP) decision-support system that blen
 
 ---
 
+## Core Innovation
+
+Forecast Forge AI adapts each model's contribution to the blended forecast according to **location × forecast lead time × weather regime**, using causally valid historical skill evidence (MAE/RMSE evaluated against ERA5 reanalysis benchmarks with strict forward-only temporal splits). This makes it a **decision-support layer** on top of existing NWP models — not a new forecast model itself — enabling quantified, reproducible justification for model weighting choices that are otherwise made subjectively.
+
+---
+
 ## Problem
 
-Operational weather forecasters using multiple NWP models (ECMWF IFS, NOAA GFS, ECMWF AIFS) have no systematic way to determine which model to trust for a given location, lead time, or weather regime. Model skill varies by variable, geography, and atmospheric condition. Manual model selection is subjective, undocumented, and not reproducible.
+Operational weather forecasters using multiple NWP models (ECMWF IFS, NOAA GFS, ECMWF AIFS · AI Model) have no systematic way to determine which model to trust for a given location, lead time, or weather regime. Model skill varies by variable, geography, and atmospheric condition. Manual model selection is subjective, undocumented, and not reproducible.
 
 ---
 
@@ -21,12 +27,12 @@ Forecast Forge AI continuously evaluates model skill against ERA5 reanalysis ref
 | Capability | Description |
 |---|---|
 | **Adaptive Model Weighting** | Ridge regression ensemble; weights updated per variable, location, and lead-time using MAE/RMSE from verified history |
-| **Spatial × Lead-Time Skill** | Weights vary by grid cell and forecast horizon — closer lead times carry independent evaluations |
+| **Spatial × Lead-Time Skill** | Weights vary by grid cell and forecast horizon — each lead-time bucket carries an independent skill evaluation |
 | **Weather-Regime Intelligence** | K-Means clustering identifies atmospheric regimes; model skill is evaluated per regime to capture non-stationary model performance |
-| **Probabilistic Guidance** | Spread-based uncertainty from multi-model disagreement; per-variable probability of exceedance |
+| **Probabilistic Guidance** | Spread-based uncertainty derived from disagreement across independent deterministic forecast sources; per-variable probability of exceedance |
 | **Extreme-Weather Detection** | Threshold-based detection (heatwave, heavy precipitation, wind alert) with regime-conditioned probability |
-| **Forecast-Bust Detection** | Detects abnormal model divergence from climatology and flags potential bust conditions before verification |
-| **Scientific Replay** | Reconstructs the exact forecast state at any past valid-time using archived provider snapshots |
+| **Forecast-Bust Detection** | Logistic regression classifier trained on causal features (lead time, model disagreement, regime, weather state) to flag elevated bust risk before verification |
+| **Scientific Replay** | Reconstructs historical forecast decisions from available archived snapshots with explicit EXACT / DEGRADED / UNAVAILABLE provenance |
 | **Decision Trace** | Every blended output is linked to the historical snapshot, algorithm version, and weights used to produce it |
 | **Nemotron Copilot** | NVIDIA Nemotron LLM assistant grounded strictly in retrieved trace context; refuses to invent data |
 
@@ -36,11 +42,13 @@ Forecast Forge AI continuously evaluates model skill against ERA5 reanalysis ref
 
 | Source | Model Identifier | Notes |
 |---|---|---|
-| ECMWF IFS | `ecmwf_ifs025` | Primary deterministic model; 0.25° resolution |
+| ECMWF IFS | `ecmwf_ifs025` | Primary deterministic NWP model; 0.25° resolution |
 | NOAA GFS | `gfs_seamless` | Global Forecast System; seamless blend of GFS cycles |
-| ECMWF AIFS | `ecmwf_aifs025` | AI-based ECMWF model; included as a third ensemble member |
+| ECMWF AIFS · AI Model | `ecmwf_aifs025` | ECMWF machine-learning forecast; third deterministic source |
 
-All sources are accessed via [Open-Meteo](https://open-meteo.com/) — an open, free API requiring no authentication. The provider registry is extensible; new models can be added by implementing the `BaseWeatherAdapter` interface.
+All three are **deterministic forecast models** accessed via [Open-Meteo](https://open-meteo.com/). They are treated as independent forecast sources for ensemble blending — not as within-model ensemble members. The provider registry is extensible; new models can be added by implementing the `BaseWeatherAdapter` interface.
+
+> **AIFS data availability note:** When ECMWF AIFS returns HTTP 200 with all-null variable values, the system reports `NO_VALID_DATA` for that provider. This reflects a limitation of the requested variable at the current resolution or time window — it does not imply a provider outage.
 
 ---
 
@@ -48,7 +56,7 @@ All sources are accessed via [Open-Meteo](https://open-meteo.com/) — an open, 
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  Next.js Frontend  (ui/)                                        │
+│  Next.js 16 Frontend  (ui/)                                     │
 │  Dashboard · Maps · Ensemble · Replay · Copilot                 │
 └──────────────────────┬──────────────────────────────────────────┘
                        │  HTTP / REST (FastAPI)
@@ -60,9 +68,9 @@ All sources are accessed via [Open-Meteo](https://open-meteo.com/) — an open, 
    Providers  Ensemble        Evaluation     Replay
    open_meteo/ engine.py    scoring.py      service.py
    ifs / gfs   adaptive.py  weighting.py    registry.py
-   /aifs       uncertainty  regimes/        
-                            bust/           
-                            lead_time_eval  
+   /aifs       uncertainty  regimes/
+                            bust/
+                            lead_time_eval
         │          │              │              │
         └──────────┴──────────────┴──────────────┘
                        │
@@ -80,12 +88,40 @@ All components operate on a **canonical data schema** (`forecast_forge/core/mode
 ## Scientific Integrity
 
 - **ERA5 is a reanalysis reference benchmark**, not observational ground truth. All historical skill evaluations reference ERA5 reanalysis data as the verification baseline.
-- **Model disagreement ≠ within-model ensemble spread.** Spread in Forecast Forge AI reflects disagreement across independent deterministic NWP models (IFS, GFS, AIFS), not internal ensemble member spread.
-- **Unavailable data is never fabricated or silently substituted.** When a provider returns missing data, the system reports `UNAVAILABLE` or `PARTIAL` status explicitly. No synthetic imputation is performed.
+- **Multi-model disagreement ≠ within-model ensemble spread.** The spread reported by Forecast Forge AI is the standard deviation across independent deterministic NWP model outputs (IFS, GFS, AIFS). It is not derived from internal ensemble member distributions and should not be interpreted as a calibrated probability or confidence interval.
+- **Unavailable data is never fabricated or silently substituted.** When a provider returns missing or unusable data, the system reports the canonical status (`NO_VALID_DATA`, `UNAVAILABLE`, `DEGRADED`) explicitly. No synthetic imputation is performed.
 - **Historical evaluations follow strict causal / chronological rules.** Training features at time *T* use only information available at or before *T*. Time-series splits are strictly forward-only.
-- **Inverse-error weighting is not Bayesian.** Weights are derived from rolling historical MAE/RMSE — this is a deterministic scoring method, not a probabilistic Bayesian update.
-- **Replay exactness depends on available provenance.** The replay engine reconstructs past forecast states from stored snapshots. Accuracy is bounded by what was archived at that time.
+- **Inverse-error weighting is not Bayesian.** Weights are derived from rolling historical MAE/RMSE — a deterministic scoring method, not a probabilistic Bayesian update.
+- **Replay accuracy is bounded by archived provenance.** The replay engine reconstructs past forecast decisions from stored provider snapshots and reports an explicit integrity status: `EXACT` when all source data is present, `DEGRADED` when partial, `UNAVAILABLE` when no archived snapshot exists.
 - **No model is universally best.** Model skill varies by variable, geography, season, and atmospheric regime. Forecast Forge AI quantifies this variability rather than assuming any single model is superior.
+
+---
+
+## Validation Snapshot
+
+Evaluation against ERA5 reanalysis reference benchmark on the included Mumbai sample dataset.
+
+**Location:** Mumbai, India (19.076°N, 72.878°E)  
+**Variable:** `temperature_2m`  
+**Reference dataset:** ERA5 reanalysis (via Open-Meteo archive API)  
+**Sample size:** 192 aligned forecast–reference pairs  
+**Lead-time bucket:** Mixed (single bucket; lead-time-stratified evaluation available via `scripts/run_lead_time_evaluation.py`)
+
+| Model / Blend | MAE (°C) | RMSE (°C) | Bias (°C) |
+|---|---|---|---|
+| ECMWF IFS (`ecmwf_ifs025`) | 0.36 | 0.47 | −0.05 |
+| NOAA GFS (`gfs_seamless`) | 1.12 | 1.27 | +0.99 |
+| Equal-weight blend | 0.39 | 0.48 | +0.32 |
+| Inverse-error blend | 0.31 | 0.38 | +0.11 |
+| Adaptive Ridge blend | 0.38 | 0.48 | −0.37 |
+
+*Out-of-sample test set (39 rows, chronological split): Inverse-error weighting (RMSE 0.380) outperforms equal-weight (RMSE 0.481) and individual GFS (RMSE 0.889) on this sample. Results are specific to this location and period — not a universal performance claim.*
+
+Reproduce with:
+```bash
+uv run python scripts/run_evaluation_report.py
+uv run python scripts/run_ensemble_comparison.py
+```
 
 ---
 
@@ -109,13 +145,13 @@ forecast-forge-ai/
 │   ├── extremes/             # Extreme-weather threshold detection
 │   ├── historical/           # ERA5 reference data loading and temporal alignment
 │   ├── orchestrator/         # End-to-end data-fetch pipeline
-│   ├── providers/            # Open-Meteo adapters (IFS, GFS, AIFS, ensemble)
+│   ├── providers/            # Open-Meteo adapters (IFS, GFS, AIFS · AI Model)
 │   ├── replay/               # Temporal state reconstruction
 │   ├── spatial/              # Geospatial grid operations and spatial weighting
 │   ├── trace/                # Decision provenance builder and storage
 │   └── validation/           # Physical bounds checking
 │
-├── ui/                       # Next.js 15 frontend
+├── ui/                       # Next.js 16 frontend
 │   └── src/
 │       ├── app/              # Page routes (forecast, ensemble, maps, replay, …)
 │       ├── components/       # React components (charts, maps, copilot, …)
@@ -129,15 +165,10 @@ forecast-forge-ai/
 │   └── api/                  # FastAPI endpoint integration tests
 │
 ├── scripts/                  # Reproducibility and evaluation scripts
-│   ├── run_evaluation_report.py
-│   ├── run_ensemble_comparison.py
-│   ├── run_lead_time_evaluation.py
-│   ├── run_regime_discovery.py
-│   └── …
 │
 └── data/
     └── raw/
-        └── mumbai_historical_sample.parquet   # ERA5-derived sample (open-source)
+        └── mumbai_historical_sample.parquet   # Reproducibility seed (see below)
 ```
 
 ---
@@ -239,26 +270,57 @@ Unit and API tests require no external credentials or network access. Integratio
 
 ## Evaluation Scripts
 
-Reproduce the published evaluation results:
+Scripts are grouped by purpose. All use relative paths and write outputs to `data/processed/` (gitignored).
 
+**Data acquisition**
 ```bash
-# Generate evaluation report from historical sample data
+# Fetch ERA5 historical reference data for a location
+uv run python scripts/fetch_historical_mumbai.py
+```
+
+**Evaluation**
+```bash
+# Per-variable model skill report (MAE, RMSE, bias, inverse-error weights)
 uv run python scripts/run_evaluation_report.py
 
-# Compare ensemble blending strategies
+# Compare equal-weight vs inverse-error vs adaptive Ridge blends
 uv run python scripts/run_ensemble_comparison.py
 
-# Evaluate per-lead-time model skill
+# Ablation study across ensemble feature configurations
+uv run python scripts/run_ablation_experiments.py
+```
+
+**Lead-time and regime**
+```bash
+# Per-lead-time skill evaluation with causal guards
 uv run python scripts/run_lead_time_evaluation.py
 
-# Discover and characterize weather regimes
+# Discover and characterize weather regimes (K-Means)
 uv run python scripts/run_regime_discovery.py
 
-# Spatial × lead-time weighting evaluation
+# Compare model skill across discovered regimes
+uv run python scripts/run_regime_baseline_comparison.py
+```
+
+**Spatial**
+```bash
+# Spatial × lead-time weight grid evaluation
 uv run python scripts/run_spatial_lead_time_evaluation.py
 ```
 
-Input data (`data/raw/mumbai_historical_sample.parquet`) is included in the repository. Generated outputs are written to `data/processed/` (gitignored — regenerate locally).
+**Replay and smoke tests**
+```bash
+# Validate replay provenance registry
+uv run python scripts/validate_replay.py
+
+# Live FastAPI smoke test (requires running backend)
+uv run python scripts/run_fastapi_smoke_test.py
+
+# Live ensemble fetch from Open-Meteo (requires network)
+uv run python scripts/run_live_ensemble.py
+```
+
+Input data (`data/raw/mumbai_historical_sample.parquet`) is a **small reproducibility seed** covering a single location and time window — sufficient to run all evaluation scripts and reproduce the metrics in the Validation Snapshot above. It is not a full historical archive; broader evaluation requires fetching additional data via `scripts/fetch_historical_mumbai.py` (adaptable to other locations).
 
 ---
 
@@ -266,21 +328,31 @@ Input data (`data/raw/mumbai_historical_sample.parquet`) is included in the repo
 
 ### Local / Development
 
-Start backend and frontend as described above.
+Start backend and frontend as described under Running the Application.
 
-### Production (Render)
+### Deploying to a Hosting Platform
 
-A `render.yaml` configuration is provided for [Render](https://render.com/) deployment. Set environment variables via the Render dashboard — never in source code.
+The backend is a standard ASGI application (FastAPI + Uvicorn) and the frontend is a standard Next.js application. They can be deployed to any platform that supports Python ASGI and Node.js respectively (e.g., Render, Railway, Fly.io, or a self-managed VPS).
+
+No automated infrastructure configuration file (e.g., `render.yaml`) is currently included in this repository. Deployment steps for a typical platform-as-a-service:
+
+1. Set all environment variables from `.env.example` via the platform dashboard.
+2. Backend build command: `uv sync --extra dev`
+3. Backend start command: `uvicorn forecast_forge.api.app:app --host 0.0.0.0 --port $PORT`
+4. Frontend build command: `cd ui && npm install && npm run build`
+5. Frontend start command: `cd ui && npm start`
 
 ---
 
 ## Known Limitations
 
-- **Single-city historical sample.** The included `data/raw/` sample covers Mumbai only. Broader spatial evaluation requires fetching additional ERA5 data via `scripts/fetch_historical_mumbai.py` (adaptable to other locations).
+- **Reproducibility seed covers Mumbai only.** `data/raw/mumbai_historical_sample.parquet` is a small sample for a single city and time window. The validation results above are specific to this sample and should not be extrapolated as general model rankings.
 - **Open-Meteo rate limits.** Live fetches are subject to Open-Meteo's free-tier rate limits. The HTTP client implements exponential backoff; for production use, consider the Open-Meteo commercial API.
-- **Replay completeness.** Scientific replay accuracy depends on what provider snapshots were stored at the time of the original forecast run. The replay engine reports `PARTIAL` status when snapshots are incomplete.
+- **Replay accuracy depends on archived provenance.** The replay engine reports `EXACT` only when all source snapshots are present. Partial or absent archives yield `DEGRADED` or `UNAVAILABLE` status respectively.
 - **Copilot requires NVIDIA API key.** The Nemotron Copilot is unavailable without a valid `NVIDIA_API_KEY`. All other system capabilities (ensemble, evaluation, maps, replay) function independently.
-- **Adaptive model is trained on-demand.** The Ridge regression ensemble model is fitted lazily from stored historical data. Cold-start accuracy is lower until sufficient verified history accumulates.
+- **Bust detector requires pre-trained model.** The logistic regression bust classifier is loaded from `.model_cache/bust/`. Without a trained model file, the service returns `INSUFFICIENT_DATA`. Train it by running `scripts/run_evaluation_report.py` and the bust training step.
+- **Adaptive model is trained on-demand.** The Ridge regression ensemble model is fitted lazily from stored historical data. Cold-start accuracy is limited until sufficient verified history accumulates.
+- **AIFS variable coverage.** ECMWF AIFS via Open-Meteo may return null values for certain variables or time windows. The system reports `NO_VALID_DATA` in these cases and excludes AIFS from that blending step rather than substituting with another model.
 - **Python 3.11 only.** The project currently targets Python 3.11 (`requires-python = ">=3.11,<3.12"`).
 
 ---

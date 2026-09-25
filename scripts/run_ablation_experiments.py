@@ -86,7 +86,7 @@ def main():
         "D (Models + Spread + Historical)": "D",
     }
 
-    for name, cfg in configs.items():
+    for _name, cfg in configs.items():
         adaptive = AdaptiveEnsembleModel(variable=var, feature_config=cfg)
         adaptive.fit(train_df, models)
         test_df_copy[f"adaptive_{cfg}_{var}"] = adaptive.predict(test_df_copy)
