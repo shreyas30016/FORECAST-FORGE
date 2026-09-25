@@ -51,13 +51,13 @@ export function Sidebar() {
         {/* Brand Header */}
         <div className="h-16 border-b border-border-subtle flex items-center px-4 justify-between bg-background/40">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform duration-300 ring-1 ring-cyan-500/20">
+            <div className="w-9 h-9 rounded-xl bg-[#020c1b] flex items-center justify-center shrink-0 shadow-lg shadow-cyan-500/40 group-hover:scale-105 transition-transform duration-300 ring-1 ring-cyan-400/30 p-1">
               <Image
                 src="/logo.svg"
                 alt="Forecast Forge AI"
-                width={32}
-                height={32}
-                className="w-full h-full object-cover"
+                width={36}
+                height={36}
+                className="w-full h-full"
                 priority
               />
             </div>
