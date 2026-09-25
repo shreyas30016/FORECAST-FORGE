@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   LayoutDashboard, 
@@ -13,7 +14,6 @@ import {
   Bell, 
   Database, 
   Settings,
-  Sparkles,
   MoreHorizontal,
   History,
   X
@@ -51,8 +51,15 @@ export function Sidebar() {
         {/* Brand Header */}
         <div className="h-16 border-b border-border-subtle flex items-center px-4 justify-between bg-background/40">
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-ensemble to-emerald-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-ensemble/20 group-hover:scale-105 transition-transform duration-300">
-              <Sparkles className="w-4 h-4 fill-slate-950" />
+            <div className="w-8 h-8 rounded-lg overflow-hidden shrink-0 shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform duration-300 ring-1 ring-cyan-500/20">
+              <Image
+                src="/logo.svg"
+                alt="Forecast Forge AI"
+                width={32}
+                height={32}
+                className="w-full h-full object-cover"
+                priority
+              />
             </div>
             <div className="leading-tight">
               <span className="text-sm font-extrabold tracking-tight text-white block">

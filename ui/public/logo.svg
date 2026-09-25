@@ -1,0 +1,127 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <!-- Dark background -->
+    <radialGradient id="bgGlow" cx="45%" cy="50%" r="55%">
+      <stop offset="0%" stop-color="#0d2a4a" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#020c1b" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Top arm gradient: cyan-green to blue -->
+    <linearGradient id="topArmGrad" x1="0%" y1="0%" x2="100%" y2="60%">
+      <stop offset="0%" stop-color="#4fffcc"/>
+      <stop offset="40%" stop-color="#00d4ff"/>
+      <stop offset="100%" stop-color="#1a7fff"/>
+    </linearGradient>
+
+    <!-- Middle arm gradient -->
+    <linearGradient id="midArmGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#00aaff"/>
+      <stop offset="100%" stop-color="#1a5fff"/>
+    </linearGradient>
+
+    <!-- Spine / lower tail gradient -->
+    <linearGradient id="spineGrad" x1="0%" y1="0%" x2="40%" y2="100%">
+      <stop offset="0%" stop-color="#00c8ff"/>
+      <stop offset="100%" stop-color="#0044cc"/>
+    </linearGradient>
+
+    <!-- Wave layer fill -->
+    <linearGradient id="waveGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0099ee" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#003399" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- Outer glow filter -->
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Strong edge glow -->
+    <filter id="edgeGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feColorMatrix in="blur" type="matrix"
+        values="0 0 0 0 0
+                0.5 0.9 1 0 0
+                0 0.8 1 0 0
+                0 0 0 1.5 0" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Sun glow -->
+    <radialGradient id="sunGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="60%" stop-color="#88ddff" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#00aaff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Clip to F shape -->
+    <clipPath id="fClip">
+      <!-- Spine vertical bar -->
+      <path d="M18,10 L28,10 L28,90 L18,90 Z"/>
+      <!-- Top arm -->
+      <path d="M18,10 L70,10 Q88,10 88,22 Q88,34 70,38 L28,38 L28,26 L68,26 Q74,26 74,22 Q74,18 68,18 L18,18 Z"/>
+      <!-- Middle arm -->
+      <path d="M18,44 L62,44 Q78,44 78,53 Q78,62 62,62 L28,62 L28,50 L60,50 Q65,50 65,53 Q65,56 60,56 L18,56 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Background circle -->
+  <rect width="100" height="100" fill="url(#bgGlow)" rx="16"/>
+
+  <!-- === F LETTERFORM === -->
+
+  <!-- Spine (vertical bar) with glow -->
+  <path d="M18,10 L28,10 L28,90 L18,90 Q14,85 14,50 Q14,20 18,10 Z"
+        fill="url(#spineGrad)" filter="url(#glow)"/>
+
+  <!-- Top arm — tapered right tip like the logo -->
+  <path d="M18,10 L72,10 Q92,10 92,23 Q92,36 72,40 L28,40 L28,10 Z"
+        fill="url(#topArmGrad)" filter="url(#edgeGlow)"/>
+
+  <!-- Top arm inner wave layers (lighter lines inside) -->
+  <g opacity="0.55" clip-path="url(#topArmClip)">
+    <path d="M28,33 Q45,29 65,32 Q75,34 82,30 L82,36 Q72,40 60,38 Q44,35 28,38 Z" fill="#88eeff" opacity="0.3"/>
+    <path d="M28,26 Q48,23 68,27 Q76,28 82,25 L82,30 Q72,33 58,30 Q44,28 28,31 Z" fill="#aaffee" opacity="0.25"/>
+    <path d="M28,19 Q50,17 70,20 Q78,21 84,18 L84,22 Q74,25 60,22 Q44,20 28,23 Z" fill="#ccffee" opacity="0.2"/>
+  </g>
+
+  <!-- Middle arm -->
+  <path d="M18,44 L64,44 Q82,44 82,54 Q82,64 64,64 L18,64 Z"
+        fill="url(#midArmGrad)" filter="url(#edgeGlow)"/>
+
+  <!-- Middle arm wave texture -->
+  <g opacity="0.5">
+    <path d="M28,50 Q40,47 55,50 Q65,52 74,49 L74,53 Q65,56 52,53 Q40,51 28,53 Z" fill="#55ccff" opacity="0.35"/>
+    <path d="M28,56 Q42,53 58,57 Q67,59 76,56 L76,60 Q66,63 55,60 Q41,57 28,59 Z" fill="#44aaff" opacity="0.3"/>
+  </g>
+
+  <!-- Lower spine wave texture -->
+  <g opacity="0.4">
+    <path d="M18,64 Q24,62 28,64 L28,70 Q24,68 18,70 Z" fill="#3399ff" opacity="0.4"/>
+    <path d="M18,70 Q24,68 28,70 L28,76 Q24,74 18,76 Z" fill="#2277dd" opacity="0.35"/>
+    <path d="M18,76 Q24,74 28,76 L28,82 Q24,80 18,82 Z" fill="#1155bb" opacity="0.3"/>
+    <path d="M18,82 Q24,80 28,82 L28,88 Q24,86 18,88 Z" fill="#0033aa" opacity="0.25"/>
+  </g>
+
+  <!-- Sun/atmospheric element in upper-left of top arm -->
+  <circle cx="33" cy="24" r="4.5" fill="url(#sunGrad)" opacity="0.85"/>
+  <!-- Subtle cloud puffs beneath sun -->
+  <ellipse cx="34" cy="30" rx="5" ry="2.5" fill="#aaddff" opacity="0.2"/>
+  <ellipse cx="30" cy="31" rx="3.5" ry="2" fill="#aaddff" opacity="0.15"/>
+  <ellipse cx="38" cy="31.5" rx="4" ry="2" fill="#aaddff" opacity="0.15"/>
+
+  <!-- Outer cyan edge glow on top arm (bright rim) -->
+  <path d="M18,10 L72,10 Q92,10 92,23 Q92,36 72,40 L28,40 L28,38 L70,38 Q88,34 88,23 Q88,12 70,12 L20,12 Z"
+        fill="none" stroke="#00ffee" stroke-width="0.8" opacity="0.7" filter="url(#glow)"/>
+
+  <!-- Outer cyan edge glow on middle arm -->
+  <path d="M18,44 L64,44 Q82,44 82,54 Q82,64 64,64 L18,64 L18,62 L64,62 Q78,62 78,54 Q78,46 64,46 L18,46 Z"
+        fill="none" stroke="#0099ff" stroke-width="0.7" opacity="0.6" filter="url(#glow)"/>
+</svg>
