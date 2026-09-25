@@ -1,51 +1,80 @@
-# Python virtual environment
+# ============================================================
+# Forecast Forge AI — .gitignore
+# ============================================================
+
+# --- Python virtual environment ---
 .venv/
 env/
 venv/
 
-# Byte-compiled / optimized files
+# --- Byte-compiled / optimized Python files ---
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyo
 
-# Testing and linting caches
+# --- Testing and linting caches ---
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .coverage
 htmlcov/
+coverage/
 
-# Build artifacts
+# --- Build / distribution artifacts ---
 dist/
 build/
 *.egg-info/
+*.whl
 
-# Environment and local secret files
+# --- Environment and secret files ---
 .env
 .env.local
+.env.*.local
+# Keep the example — it must stay tracked
+!.env.example
 
-# Data storage
-data/
-*.parquet
+# --- Data: exclude large/generated datasets; keep raw seed data ---
+# Exclude all processed/generated outputs
+data/processed/
+# Exclude parquet files globally EXCEPT the reproducibility seed in data/raw/
+# Note: negation only works when the parent directory itself is not ignored
+data/raw/*.parquet
+!data/raw/mumbai_historical_sample.parquet
+
+# --- Local model and trace caches ---
 .model_cache/
 .trace_cache/
 
-# IDE and OS files
+# --- IDE and OS files ---
 .DS_Store
 Thumbs.db
 .vscode/
+*.swp
+*.swo
 
-# Antigravity & Scratch files
+# --- Internal / development-only directories ---
 .agents/
 Forcast_Forge_AI_MD/
 scratch/
-scripts/
 
-# Frontend
+# --- Logs ---
+*.log
+logs/
+
+# --- Frontend: Next.js build output and dependencies ---
 ui/node_modules/
 ui/.next/
 ui/out/
 ui/build/
+ui/.env
 ui/.env.local
 ui/.env.development.local
 ui/.env.test.local
 ui/.env.production.local
+ui/coverage/
+ui/.vercel/
+ui/*.tsbuildinfo
+
+# --- Node (root level, just in case) ---
+node_modules/
