@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AlertCircle, CheckCircle, Info } from 'lucide-react';
 import { useSettings } from '@/context/SettingsContext';
+import { API_BASE_URL } from '@/lib/api';
 
 interface BustFactor {
   name: string;
@@ -39,8 +40,7 @@ export function ForecastBustPanel({ latitude, longitude, horizonHours, model, lo
     async function fetchData() {
       setLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-        const res = await fetch(`${baseUrl}/bust/signal?latitude=${latitude}&longitude=${longitude}&lead_time_hours=${horizonHours}&model=${model}&location_name=${encodeURIComponent(locationName)}&variable=temperature_2m`);
+        const res = await fetch(`${API_BASE_URL}/bust/signal?latitude=${latitude}&longitude=${longitude}&lead_time_hours=${horizonHours}&model=${model}&location_name=${encodeURIComponent(locationName)}&variable=temperature_2m`);
         if (res.ok && !ignore) {
           const fetchedData = await res.json();
           setData(fetchedData);

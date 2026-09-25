@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ProbabilisticForecast, EventProbabilityResult } from "@/types/api";
+import { API_BASE_URL } from "@/lib/api";
 
 interface ProbabilisticPanelProps {
   latitude: number;
@@ -21,10 +22,8 @@ export function ProbabilisticPanel({ latitude, longitude, variable, horizonHours
     async function fetchData() {
       setLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-        
         // Fetch distribution
-        const res = await fetch(`${baseUrl}/probabilistic/forecast?latitude=${latitude}&longitude=${longitude}&variable=${variable}&horizon_hours=${horizonHours}&model=${model}`);
+        const res = await fetch(`${API_BASE_URL}/probabilistic/forecast?latitude=${latitude}&longitude=${longitude}&variable=${variable}&horizon_hours=${horizonHours}&model=${model}`);
         if (res.ok && !ignore) {
           const data = await res.json();
           setForecasts(data);
@@ -34,7 +33,7 @@ export function ProbabilisticPanel({ latitude, longitude, variable, horizonHours
         if (variable === "precipitation") {
           const thresholds = [5.0, 10.0, 25.0];
           const eventPromises = thresholds.map(t => 
-            fetch(`${baseUrl}/probabilistic/probability?latitude=${latitude}&longitude=${longitude}&variable=${variable}&operator=${encodeURIComponent(">=")}&threshold=${t}&horizon_hours=${horizonHours}&model=${model}`).then(r => r.json())
+            fetch(`${API_BASE_URL}/probabilistic/probability?latitude=${latitude}&longitude=${longitude}&variable=${variable}&operator=${encodeURIComponent(">=")}&threshold=${t}&horizon_hours=${horizonHours}&model=${model}`).then(r => r.json())
           );
           
           const eventResults = await Promise.all(eventPromises);

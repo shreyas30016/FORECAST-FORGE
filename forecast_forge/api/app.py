@@ -32,8 +32,10 @@ def create_app() -> FastAPI:
     )
 
     # Configure CORS
+    # Default includes localhost for dev + production Vercel URL
     allowed_origins = os.getenv(
-        "CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000"
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000,https://forecast-forge-ai.vercel.app"
     )
     app.add_middleware(
         CORSMiddleware,

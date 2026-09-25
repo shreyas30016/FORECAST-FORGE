@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSettings } from "@/context/SettingsContext";
+import { API_BASE_URL } from "@/lib/api";
 
 interface ExtremeEvent {
   event_type: string;
@@ -45,8 +46,7 @@ export function ExtremesPanel({ latitude, longitude, horizonHours, model }: Extr
     async function fetchData() {
       setLoading(true);
       try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-        const res = await fetch(`${baseUrl}/extremes/guidance?latitude=${latitude}&longitude=${longitude}&lead_time_hours=${horizonHours}&model=${model}`);
+        const res = await fetch(`${API_BASE_URL}/extremes/guidance?latitude=${latitude}&longitude=${longitude}&lead_time_hours=${horizonHours}&model=${model}`);
         if (res.ok && !ignore) {
           const data = await res.json();
           setEvents(data);
