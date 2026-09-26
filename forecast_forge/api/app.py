@@ -32,7 +32,8 @@ def create_app() -> FastAPI:
     )
 
     # Configure CORS
-    # In production (Vercel), frontend and backend share same origin, but CORS still needed for credentials
+    # In production (Vercel), frontend and backend share same origin,
+    # but CORS still needed for credentials
     # In development, allow localhost origins
     allowed_origins = os.getenv(
         "CORS_ALLOWED_ORIGINS",

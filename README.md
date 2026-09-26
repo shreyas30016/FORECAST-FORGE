@@ -328,19 +328,15 @@ Input data (`data/raw/mumbai_historical_sample.parquet`) is a **small reproducib
 
 ### Local / Development
 
-Start backend and frontend as described under Running the Application.
+Start backend and frontend as described under **Running the Application**.
 
-### Deploying to a Hosting Platform
+### Production
 
-The backend is a standard ASGI application (FastAPI + Uvicorn) and the frontend is a standard Next.js application. They can be deployed to any platform that supports Python ASGI and Node.js respectively (e.g., Render, Railway, Fly.io, or a self-managed VPS).
+The final production architecture uses a split deployment:
+- **Backend**: FastAPI API deployed on **Railway**
+- **Frontend**: Next.js UI deployed on **Vercel**
 
-No automated infrastructure configuration file (e.g., `render.yaml`) is currently included in this repository. Deployment steps for a typical platform-as-a-service:
-
-1. Set all environment variables from `.env.example` via the platform dashboard.
-2. Backend build command: `uv sync --extra dev`
-3. Backend start command: `uvicorn forecast_forge.api.app:app --host 0.0.0.0 --port $PORT`
-4. Frontend build command: `cd ui && npm install && npm run build`
-5. Frontend start command: `cd ui && npm start`
+For step-by-step instructions on deploying the full stack, configuring CORS, and setting up environment variables, see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 

@@ -44,9 +44,8 @@ async def get_ensemble(
     except Exception as e:
         raise APIException("ENSEMBLE_FETCH_ERROR", str(e), status_code=500) from e
 
-    # We will compute the ensemble for the *current hour* for demonstration.
-    # In a full API, you might return timeseries. For this endpoint, we return one valid_time.
-    # Let's pick the first valid timestamp in the future, or fall back to the latest record
+    # Calculate ensemble for the first valid future timestamp, or fallback to the latest
+    # available record to provide the most immediately actionable point forecast.
     target_time = None
     now_utc = datetime.now(UTC)
     for _model_name, res in results.items():
@@ -83,7 +82,9 @@ async def get_ensemble(
                 )
             )
 
-    weights = [
+    # Fallback historical weights used if dynamic adaptive weights cannot be calculated
+    # for the requested coordinates/horizon. Derived from Phase 3 global performance metrics.
+    fallback_weights = [
         EnsembleWeight(model="ecmwf_ifs025", weight=0.73),
         EnsembleWeight(model="gfs_seamless", weight=0.27),
     ]
@@ -93,7 +94,7 @@ async def get_ensemble(
         variable=variable,
         valid_time=target_time.replace(tzinfo=None),
         forecasts=forecasts,
-        historical_weights=weights,
+        historical_weights=fallback_weights,
         expected_total_models=3,
     )
 
@@ -103,11 +104,11 @@ async def get_ensemble(
         w = 0.0
         if ensemble_res.adaptive_weights:
             w = next((w.weight for w in ensemble_res.adaptive_weights if w.model == mf.model), 0.0)
-        elif weights and mf.is_valid:
+        elif fallback_weights and mf.is_valid:
             valid_models = {f.model for f in ensemble_res.model_forecasts if f.is_valid}
-            total = sum(xw.weight for xw in weights if xw.model in valid_models)
+            total = sum(xw.weight for xw in fallback_weights if xw.model in valid_models)
             if total > 0:
-                raw = next((xw.weight for xw in weights if xw.model == mf.model), 0.0)
+                raw = next((xw.weight for xw in fallback_weights if xw.model == mf.model), 0.0)
                 w = raw / total
 
         models_api[mf.model] = ModelForecastAPI(

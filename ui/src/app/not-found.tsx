@@ -11,13 +11,13 @@ export default function NotFound() {
         
         <div className="space-y-1">
           <span className="text-[11px] font-mono uppercase tracking-wider text-ensemble font-semibold">
-            Error 404 · Unresolved Coordinate
+            Error 404
           </span>
           <h1 className="text-2xl font-black text-white tracking-tight">
-            Route Not Found
+            Page Not Found
           </h1>
           <p className="text-xs text-text-secondary leading-relaxed">
-            The requested meteorological endpoint does not exist or has been relocated.
+            The requested page does not exist or has been removed.
           </p>
         </div>
 

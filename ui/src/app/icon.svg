@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <!-- Top arm: cyan-green → blue -->
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#40ffcc"/>
+      <stop offset="50%" stop-color="#00c8ff"/>
+      <stop offset="100%" stop-color="#1a6fff"/>
+    </linearGradient>
+    <!-- Middle arm: blue -->
+    <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00aaff"/>
+      <stop offset="100%" stop-color="#0044dd"/>
+    </linearGradient>
+    <!-- Spine: cyan → deep blue -->
+    <linearGradient id="g3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00ccff"/>
+      <stop offset="100%" stop-color="#0033bb"/>
+    </linearGradient>
+    <!-- Glow filter -->
+    <filter id="glow" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="1.8" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Vertical spine -->
+  <path d="M12 8 L26 8 L26 92 L12 92 Q8 80 8 50 Q8 20 12 8 Z"
+        fill="url(#g3)" filter="url(#glow)"/>
+
+  <!-- Top arm — sweeps right and tapers to a point like the F logo -->
+  <path d="M12 8 L68 8 Q90 8 92 22 Q94 36 74 42 L26 42 L26 8 Z"
+        fill="url(#g1)" filter="url(#glow)"/>
+
+  <!-- Top arm inner highlight waves -->
+  <path d="M26 34 Q46 30 66 33 Q76 35 84 31 L84 36 Q74 40 62 37 Q44 34 26 37 Z"
+        fill="#88eeff" opacity="0.30"/>
+  <path d="M26 25 Q48 22 68 26 Q77 27 83 23 L83 27 Q73 31 60 28 Q44 26 26 28 Z"
+        fill="#aaffee" opacity="0.22"/>
+
+  <!-- Middle arm — shorter, parallel to top -->
+  <path d="M12 50 L60 50 Q80 50 80 61 Q80 72 60 72 L12 72 Z"
+        fill="url(#g2)" filter="url(#glow)"/>
+
+  <!-- Middle arm inner highlight -->
+  <path d="M26 56 Q42 53 56 57 Q64 59 72 55 L72 60 Q63 63 52 60 Q40 57 26 60 Z"
+        fill="#66ccff" opacity="0.28"/>
+
+  <!-- Sun dot in upper-left of top arm -->
+  <circle cx="35" cy="25" r="5" fill="#ffffff" opacity="0.90"/>
+  <circle cx="35" cy="25" r="8" fill="#88ddff" opacity="0.25"/>
+
+  <!-- Cyan rim highlights on top arm edge -->
+  <path d="M68 8 Q90 8 92 22 Q94 36 74 42 L70 40 Q88 34 88 22 Q88 10 68 10 Z"
+        fill="#00ffee" opacity="0.55"/>
+
+  <!-- Cyan rim on middle arm edge -->
+  <path d="M60 50 Q80 50 80 61 Q80 72 60 72 L58 70 Q76 70 76 61 Q76 52 60 52 Z"
+        fill="#00aaff" opacity="0.40"/>
+</svg>
