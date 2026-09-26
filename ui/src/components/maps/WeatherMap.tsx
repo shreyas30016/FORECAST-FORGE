@@ -153,6 +153,18 @@ function MapInteractionListener({ onSelect }: { onSelect: (lat: number, lon: num
   return null;
 }
 
+// Forces Leaflet to recalculate size after mount to prevent tile squishing on mobile
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+}
+
 export function WeatherMap({
   className = "",
   height = "h-[360px]",
@@ -976,6 +988,9 @@ export function WeatherMap({
           {/* Smooth Recenter Controller */}
           <RecenterOnLocation lat={location.latitude} lon={location.longitude} />
 
+          {/* Force Resize on Mount for Mobile */}
+          <MapResizer />
+
           {/* Map Click Listener */}
           <MapInteractionListener
             onSelect={(lat, lon) => {
@@ -986,20 +1001,20 @@ export function WeatherMap({
       </div>
 
       {/* Bottom Status & Attribution Strip */}
-      <div className="bg-background/90 border-t border-border-subtle px-3 py-1 text-[10px] text-text-secondary flex items-center justify-between z-10 shrink-0">
-        <div className="flex items-center gap-2">
+      <div className="bg-background/90 border-t border-border-subtle px-3 py-2 text-[9px] sm:text-[10px] text-text-secondary flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 sm:gap-0 z-10 shrink-0">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
           <span>Click map to select target coordinates</span>
-          <span className="text-border-subtle">|</span>
+          <span className="text-border-subtle hidden sm:inline">|</span>
           <span>© OpenStreetMap contributors</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
           {activeOverlay !== "none" && (
             <span className="text-white font-semibold">
               FIELD: <span className="text-ensemble uppercase">{activeOverlay === "cloud_cover" ? "CLOUD COVER" : activeOverlay}</span>
             </span>
           )}
           <span className="text-ensemble font-semibold tracking-wider">
-            BASEMAP: OPENSTREETMAP (STANDARD RASTER)
+            BASEMAP: OPENSTREETMAP
           </span>
         </div>
       </div>
