@@ -352,7 +352,7 @@ export function WeatherMap({
     <div className={`relative w-full ${height} bg-panel border border-border-subtle rounded-sm overflow-hidden flex flex-col font-mono text-xs ${className}`}>
       
       {/* Top-Left: Station Coordinate Telemetry HUD */}
-      <div className="absolute top-2 left-2 z-[400] bg-background/90 backdrop-blur-sm border border-border-subtle px-2.5 py-1.5 rounded-sm shadow-lg flex items-center gap-3">
+      <div className="absolute top-2 left-2 z-[1000] bg-background/90 backdrop-blur-sm border border-border-subtle px-2.5 py-1.5 rounded-sm shadow-lg flex items-center gap-3">
         <div className="flex items-center gap-1.5 text-ensemble">
           <Crosshair className="w-3.5 h-3.5" />
           <span className="font-bold text-white uppercase">{location.name}</span>
@@ -365,7 +365,7 @@ export function WeatherMap({
 
       {/* AIFS Null Safety Warning Banner */}
       {selectedModel === "ecmwf_aifs025" && activeOverlay !== "none" && (
-        <div className="absolute top-11 left-2 z-[400] bg-panel/95 border border-status-unavailable/60 text-status-unavailable px-3 py-1.5 rounded-sm shadow-xl flex items-center gap-2 max-w-lg text-[11px] animate-fade-in">
+        <div className="absolute top-11 left-2 z-[1000] bg-panel/95 border border-status-unavailable/60 text-status-unavailable px-3 py-1.5 rounded-sm shadow-xl flex items-center gap-2 max-w-lg text-[11px] animate-fade-in">
           <ShieldAlert className="w-4 h-4 shrink-0 text-status-unavailable" />
           <div>
             <strong className="block font-bold">ECMWF ECMWF AIFS · AI Model: NULL SAFETY ACTIVE</strong>
@@ -378,7 +378,7 @@ export function WeatherMap({
 
       {/* Error Notice Banner */}
       {error && (
-        <div className="absolute top-11 left-2 z-[400] bg-panel/95 border border-status-unavailable text-status-unavailable px-3 py-1.5 rounded-sm shadow-xl flex items-center gap-2 max-w-md text-[11px]">
+        <div className="absolute top-11 left-2 z-[1000] bg-panel/95 border border-status-unavailable text-status-unavailable px-3 py-1.5 rounded-sm shadow-xl flex items-center gap-2 max-w-md text-[11px]">
           <AlertTriangle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
@@ -386,7 +386,7 @@ export function WeatherMap({
 
       {/* Floating Top-Right: Meteorological Layer & Model Control HUD */}
       {showLayerSlots && (
-        <div className="absolute top-2 right-2 z-[400] bg-background/95 backdrop-blur-sm border border-border-subtle p-2 rounded-sm shadow-2xl flex flex-col gap-2 max-w-[250px] text-[11px]">
+        <div className="absolute top-2 right-2 z-[1000] bg-background/95 backdrop-blur-sm border border-border-subtle p-2 rounded-sm shadow-2xl flex flex-col gap-2 max-w-[250px] text-[11px]">
           <div className="flex items-center justify-between pb-1 border-b border-border-subtle">
             <span className="flex items-center gap-1.5 font-bold text-white uppercase">
               <Layers className="w-3.5 h-3.5 text-ensemble" /> Weather Overlays
@@ -574,7 +574,7 @@ export function WeatherMap({
 
       {/* Ensemble Uncertainty Notice Modal */}
       {activeOverlay === "uncertainty" && (
-        <div className="absolute inset-0 z-[450] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="absolute inset-0 z-[1010] bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-panel border border-border-subtle p-5 rounded-sm max-w-md text-center space-y-3 shadow-2xl">
             <div className="w-10 h-10 rounded-full bg-ensemble/10 border border-ensemble/30 text-ensemble flex items-center justify-center mx-auto">
               <Info className="w-5 h-5" />
@@ -598,7 +598,7 @@ export function WeatherMap({
 
       {/* Floating Bottom-Left: Scientific Legend HUD */}
       {activeOverlay !== "none" && activeOverlay !== "uncertainty" && (
-        <div className="absolute bottom-9 left-2 z-[400] bg-background/95 backdrop-blur-sm border border-border-subtle px-3 py-2 rounded-sm shadow-xl text-[10px] space-y-1.5 max-w-xs animate-fade-in">
+        <div className="absolute bottom-9 left-2 z-[1000] bg-background/95 backdrop-blur-sm border border-border-subtle px-3 py-2 rounded-sm shadow-xl text-[10px] space-y-1.5 max-w-xs animate-fade-in">
           {/* Ensemble Legend */}
           {activeOverlay === "ensemble" && (
             <div>
