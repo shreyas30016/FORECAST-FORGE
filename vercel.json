@@ -1,28 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "ui/package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/v1/(.*)",
-      "dest": "/api/index.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/ui/$1"
-    }
-  ],
-  "env": {
-    "NVIDIA_API_KEY": "@nvidia_api_key",
-    "PYTHON_VERSION": "3.11"
-  },
-  "regions": ["iad1"]
+  "buildCommand": "cd ui && npm run build",
+  "outputDirectory": "ui/.next",
+  "installCommand": "cd ui && npm install"
 }

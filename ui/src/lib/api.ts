@@ -12,10 +12,9 @@ import {
   RegimeResponse
 } from "@/types/api";
 
-// In production, API is served from same domain at /api/v1
-// In development, use separate backend server at localhost:8000
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 
-  (process.env.NODE_ENV === 'production' ? '/api/v1' : 'http://localhost:8000/api/v1');
+// Production: Use environment variable pointing to separate backend (Railway/Render)
+// Development: Use localhost backend
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
 
 export { API_BASE_URL };
 
