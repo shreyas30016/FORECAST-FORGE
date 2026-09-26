@@ -174,7 +174,7 @@ export function Topbar() {
   };
 
   return (
-    <header className="h-16 bg-panel/75 backdrop-blur-md border-b border-border-subtle flex items-center justify-between px-3 sm:px-5 lg:px-6 shrink-0 z-30">
+    <header className="h-16 bg-panel/75 backdrop-blur-md border-b border-border-subtle flex items-center justify-between px-3 sm:px-5 lg:px-6 shrink-0 z-[2000]">
       
       {/* Location Selector & Station Context */}
       <div className="flex items-center gap-3 relative">
@@ -212,7 +212,7 @@ export function Topbar() {
         {/* Backdrop for click-outside */}
         {dropdownOpen && (
           <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-xs"
+            className="fixed inset-0 z-[2010] bg-black/40 backdrop-blur-xs"
             onClick={() => setDropdownOpen(false)}
             aria-hidden="true"
           />
@@ -220,7 +220,7 @@ export function Topbar() {
 
         {/* Dropdown Menu */}
         {dropdownOpen && (
-          <div className="absolute top-12 left-0 w-88 sm:w-96 max-w-[calc(100vw-2rem)] bg-panel-elevated/95 backdrop-blur-2xl border border-border-subtle shadow-2xl rounded-2xl p-3 z-50 text-xs font-sans animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute top-12 left-0 w-88 sm:w-96 max-w-[calc(100vw-2rem)] bg-panel-elevated/95 backdrop-blur-2xl border border-border-subtle shadow-2xl rounded-2xl p-3 z-[2020] text-xs font-sans animate-in fade-in zoom-in-95 duration-150">
             
             {/* Header with Back and Close Buttons */}
             <div className="flex items-center justify-between px-1 pb-2 mb-2.5 border-b border-border-subtle">
