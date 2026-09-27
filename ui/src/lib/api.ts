@@ -14,7 +14,13 @@ import {
 
 // Production: Use environment variable pointing to separate backend (Railway/Render)
 // Development: Use localhost backend
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api/v1';
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+if (process.env.NODE_ENV === 'production' && !configuredApiUrl) {
+  throw new Error("CRITICAL CONFIGURATION ERROR: NEXT_PUBLIC_API_BASE_URL is missing in production. Do NOT fallback to localhost.");
+}
+
+const API_BASE_URL = configuredApiUrl || 'http://127.0.0.1:8000/api/v1';
 
 export { API_BASE_URL };
 

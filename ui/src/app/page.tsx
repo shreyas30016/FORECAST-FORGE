@@ -259,11 +259,10 @@ export default function Dashboard() {
               : "UNAVAILABLE"
             }
             value={ifsForecast?.forecast ?? null}
-            weight={ifsForecast?.weight ?? 0.73}
+            weight={ifsForecast?.weight ?? 0}
             precipitation={ifsRecord?.precipitation}
             windSpeed={ifsRecord?.wind_speed_10m}
             humidity={ifsRecord?.relative_humidity_2m}
-            skill={{ mae: 0.36, rmse: 0.47 }}
           />
 
           {/* NOAA GFS Card */}
@@ -277,11 +276,10 @@ export default function Dashboard() {
               : "UNAVAILABLE"
             }
             value={gfsForecast?.forecast ?? null}
-            weight={gfsForecast?.weight ?? 0.27}
+            weight={gfsForecast?.weight ?? 0}
             precipitation={gfsRecord?.precipitation}
             windSpeed={gfsRecord?.wind_speed_10m}
             humidity={gfsRecord?.relative_humidity_2m}
-            skill={{ mae: 1.12, rmse: 1.27 }}
           />
 
           {/* ECMWF AIFS · AI Model Card — Honest null-safety, not a provider outage */}

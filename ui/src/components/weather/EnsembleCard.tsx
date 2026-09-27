@@ -30,12 +30,28 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
     : rawUncertainty;
   const models = ensemble.models || {};
 
-  const ifs = models["ecmwf_ifs025"];
-  const gfs = models["gfs_seamless"];
+  const activeModels = Object.entries(models)
+    .filter(([_, m]) => m.weight > 0)
+    .sort((a, b) => b[1].weight - a[1].weight);
 
-  const ifsWeight = ifs ? Math.round((ifs.weight || 0) * 100) : 73;
-  const gfsWeight = gfs ? Math.round((gfs.weight || 0) * 100) : 27;
+  const excludedModels = Object.entries(models)
+    .filter(([_, m]) => m.weight === 0 || !m.weight);
+
   const dataQuality = ensemble.ensemble.data_quality || "HIGH";
+
+  const getModelColor = (modelId: string) => {
+    if (modelId.includes("ifs")) return "bg-ifs";
+    if (modelId.includes("gfs")) return "bg-gfs";
+    if (modelId.includes("aifs")) return "bg-aifs";
+    return "bg-gray-400";
+  };
+
+  const formatModelName = (modelId: string) => {
+    if (modelId === "ecmwf_ifs025") return "ECMWF IFS";
+    if (modelId === "gfs_seamless") return "NOAA GFS";
+    if (modelId === "ecmwf_aifs025") return "ECMWF AIFS";
+    return modelId;
+  };
 
   return (
     <div
@@ -43,10 +59,8 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
       role="region"
       aria-label="Ensemble Synthesis Card"
     >
-      {/* Ambient glow */}
       <div className="absolute top-0 right-0 w-72 h-72 bg-ensemble/8 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
 
-      {/* Header */}
       <div className="relative z-10 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-ensemble/15 border border-ensemble/30 flex items-center justify-center text-ensemble shadow-inner">
@@ -69,9 +83,7 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
         </span>
       </div>
 
-      {/* Main values: ensemble result + spread */}
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Ensemble value */}
         <div className="p-5 rounded-xl bg-background/60 backdrop-blur-md border border-ensemble/20 space-y-2">
           <div className="text-xs font-mono text-text-muted uppercase tracking-wider">Ensemble Forecast</div>
           <div className="flex items-baseline gap-2">
@@ -87,7 +99,6 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
           </p>
         </div>
 
-        {/* Model spread */}
         <div className="p-5 rounded-xl bg-background/60 backdrop-blur-md border border-amber-500/15 space-y-2">
           <div className="flex items-center justify-between text-xs font-mono text-text-muted uppercase tracking-wider">
             <span className="flex items-center gap-1.5 text-amber-400">
@@ -100,82 +111,75 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
             <span className="text-5xl font-black text-amber-400 font-sans">
               {uncertainty !== null && uncertainty !== undefined
                 ? `±${typeof uncertainty === "number" ? uncertainty.toFixed(2) : uncertainty}`
-                : "±0.5"}
+                : "—"}
             </span>
-            <span className="text-base font-semibold text-amber-400/80">{unit}</span>
+            <span className="text-base font-semibold text-amber-400/80">{uncertainty !== null && uncertainty !== undefined ? unit : ""}</span>
           </div>
           <p className="text-[11px] font-mono text-amber-400/70">
-            |IFS − GFS| · Threshold heuristic: {convertTempDelta(3.5).toFixed(1)}{tempSymbol}
+            Model disagreement
           </p>
         </div>
       </div>
 
-      {/* Weight distribution */}
       <div className="relative z-10 space-y-3">
         <div className="flex items-center justify-between text-xs font-mono text-text-muted">
           <span>Model Weight Distribution</span>
           <span>Normalized over active models</span>
         </div>
 
-        {/* Segmented bar */}
         <div
           className="w-full h-2.5 rounded-full bg-background border border-white/10 flex overflow-hidden"
           role="img"
-          aria-label={`IFS ${ifsWeight}%, GFS ${gfsWeight}%, AIFS excluded`}
+          aria-label="Weight Distribution"
         >
-          <div
-            className="h-full bg-ifs rounded-l-full transition-all duration-500"
-            style={{ width: `${ifsWeight}%` }}
-          />
-          <div
-            className="h-full bg-gfs transition-all duration-500"
-            style={{ width: `${gfsWeight}%` }}
-          />
+          {activeModels.map(([id, m]) => (
+            <div
+              key={id}
+              className={`h-full ${getModelColor(id)} transition-all duration-500 border-r border-background/20 last:border-0`}
+              style={{ width: `${m.weight * 100}%` }}
+              title={`${formatModelName(id)}: ${Math.round(m.weight * 100)}%`}
+            />
+          ))}
         </div>
 
-        {/* Legend */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-mono">
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-ifs shrink-0" />
-            <span className="text-white">ECMWF IFS</span>
-            <span className="text-text-muted">({ifsWeight}%)</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-gfs shrink-0" />
-            <span className="text-white">NOAA GFS</span>
-            <span className="text-text-muted">({gfsWeight}%)</span>
-          </div>
-          <div className="flex items-center gap-1.5 opacity-50">
-            <span className="w-2 h-2 rounded-full bg-aifs shrink-0" />
-            <span className="text-text-muted">ECMWF AIFS · AI Model</span>
-            <span className="text-amber-400 font-semibold">(0% · No valid data)</span>
-          </div>
+          {activeModels.map(([id, m]) => (
+            <div key={id} className="flex items-center gap-1.5">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${getModelColor(id)}`} />
+              <span className="text-white">{formatModelName(id)}</span>
+              <span className="text-text-muted">({Math.round(m.weight * 100)}%)</span>
+            </div>
+          ))}
+          {excludedModels.map(([id, m]) => (
+            <div key={id} className="flex items-center gap-1.5 opacity-50">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${getModelColor(id)}`} />
+              <span className="text-text-muted">{formatModelName(id)}</span>
+              <span className="text-amber-400 font-semibold">(0% · {m.status === "NO_VALID_DATA" ? "No valid data" : m.status})</span>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* Deterministic rationale with progressive disclosure */}
       <div className="relative z-10 p-3.5 rounded-xl bg-background/40 border border-white/5 space-y-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5 text-[11px] font-mono font-bold text-ensemble uppercase tracking-wide">
             <Info className="w-3.5 h-3.5 shrink-0" aria-hidden />
             <span>Synthesis Rationale</span>
           </div>
-          <span className="text-[10px] font-mono text-text-muted">
-            IFS {ifsWeight}% · GFS {gfsWeight}% · AIFS 0%
-          </span>
         </div>
         <p className="text-xs text-text-secondary leading-snug">
           Adaptive weighting based on evaluated historical skill. Missing values strictly excluded per null-safety.
         </p>
-        <details className="pt-1 group">
-          <summary className="text-[10px] font-mono text-ensemble hover:text-white cursor-pointer transition-colors select-none">
-            [View full methodology &amp; reasoning]
-          </summary>
-          <p className="text-[11px] text-text-muted mt-1.5 leading-relaxed bg-background/60 p-2.5 rounded-lg border border-white/5 font-mono">
-            {ensemble.explanation?.reasoning ||
-              `Adaptive ensemble assigns ${ifsWeight}% to ECMWF IFS and ${gfsWeight}% to NOAA GFS based on evaluated historical skill for ${ensemble.variable}. ECMWF AIFS · AI Model excluded — no valid forecast values for this context.`}
-          </p>
-        </details>
+        {ensemble.explanation?.reasoning && (
+          <details className="pt-1 group">
+            <summary className="text-[10px] font-mono text-ensemble hover:text-white cursor-pointer transition-colors select-none">
+              [View full methodology &amp; reasoning]
+            </summary>
+            <p className="text-[11px] text-text-muted mt-1.5 leading-relaxed bg-background/60 p-2.5 rounded-lg border border-white/5 font-mono">
+              {ensemble.explanation.reasoning}
+            </p>
+          </details>
+        )}
       </div>
     </div>
   );

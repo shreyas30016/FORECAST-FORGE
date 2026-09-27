@@ -115,8 +115,8 @@ export default function EnsemblePage() {
 
   const ifsForecast = ifs && ifs.forecast !== null ? (isTemp ? convertTemp(ifs.forecast) : ifs.forecast) : null;
   const gfsForecast = gfs && gfs.forecast !== null ? (isTemp ? convertTemp(gfs.forecast) : gfs.forecast) : null;
-  const ifsContrib = ifsForecast !== null ? (ifsForecast * (ifs?.weight || 0.73)).toFixed(2) : "—";
-  const gfsContrib = gfsForecast !== null ? (gfsForecast * (gfs?.weight || 0.27)).toFixed(2) : "—";
+  const ifsContrib = ifsForecast !== null && ifs?.weight ? (ifsForecast * ifs.weight).toFixed(2) : "—";
+  const gfsContrib = gfsForecast !== null && gfs?.weight ? (gfsForecast * gfs.weight).toFixed(2) : "—";
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-12 font-sans">
@@ -196,7 +196,7 @@ export default function EnsemblePage() {
           </div>
           <div className="flex items-baseline gap-3">
             <span className="text-5xl sm:text-6xl font-black text-amber-400 font-sans">
-              {uncertainty !== null && uncertainty !== undefined ? `±${uncertainty} ${unit}` : "±0.5°"}
+              {uncertainty !== null && uncertainty !== undefined ? `±${uncertainty} ${unit}` : "—"}
             </span>
             <span className="text-xs font-mono text-text-secondary">
               |ECMWF − NOAA|
@@ -276,9 +276,7 @@ export default function EnsemblePage() {
               <span>Contribution:</span>
               <span className="text-ensemble font-bold">+{ifsContrib}{unit}</span>
             </div>
-            <div className="text-[10px] text-text-muted pt-1 border-t border-white/5">
-              ERA5 MAE: {convertTempDelta(0.360).toFixed(3)}{tempSymbol} (Lowest historical error)
-            </div>
+
           </div>
 
           {/* GFS Breakdown */}
@@ -297,9 +295,7 @@ export default function EnsemblePage() {
               <span>Contribution:</span>
               <span className="text-ensemble font-bold">+{gfsContrib}{unit}</span>
             </div>
-            <div className="text-[10px] text-text-muted pt-1 border-t border-white/5">
-              ERA5 MAE: {convertTempDelta(1.119).toFixed(3)}{tempSymbol} (Compensated for warm bias)
-            </div>
+
           </div>
 
           {/* AIFS Breakdown */}

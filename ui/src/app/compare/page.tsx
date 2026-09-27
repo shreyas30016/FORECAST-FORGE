@@ -122,7 +122,7 @@ export default function ComparePage() {
   const pairwiseSpread = rawDelta !== null ? convertTempDelta(rawDelta).toFixed(2) : "—";
   const spreadDisplay = ensemble.ensemble.uncertainty !== null && typeof ensemble.ensemble.uncertainty === 'number'
     ? `±${convertTempDelta(ensemble.ensemble.uncertainty).toFixed(2)}${tempSymbol}`
-    : `±0.5${tempSymbol}`;
+    : `—`;
 
   return (
     <div className="flex flex-col gap-6 max-w-7xl mx-auto pb-12 font-sans">
@@ -200,7 +200,7 @@ export default function ComparePage() {
                 {ifsVal !== null && ifsVal !== undefined ? `${ifsVal}${tempSymbol}` : "—"}
               </span>
               <span className="text-xs font-mono text-ifs font-semibold">
-                Weight: {ifsModel ? Math.round(ifsModel.weight * 100) : 73}%
+                Weight: {ifsModel ? Math.round(ifsModel.weight * 100) + '%' : "—"}
               </span>
             </div>
           </div>
@@ -221,10 +221,7 @@ export default function ComparePage() {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/5 text-[10px] font-mono text-text-muted flex justify-between">
-            <span>ERA5 Benchmark:</span>
-            <span className="text-white font-semibold">MAE {convertTempDelta(0.36).toFixed(2)}{tempSymbol} | RMSE {convertTempDelta(0.47).toFixed(2)}{tempSymbol}</span>
-          </div>
+
         </div>
 
         {/* NOAA GFS Card */}
@@ -251,7 +248,7 @@ export default function ComparePage() {
                 {gfsVal !== null && gfsVal !== undefined ? `${gfsVal}${tempSymbol}` : "—"}
               </span>
               <span className="text-xs font-mono text-gfs font-semibold">
-                Weight: {gfsModel ? Math.round(gfsModel.weight * 100) : 27}%
+                Weight: {gfsModel ? Math.round(gfsModel.weight * 100) + '%' : "—"}
               </span>
             </div>
           </div>
@@ -272,10 +269,7 @@ export default function ComparePage() {
             </div>
           </div>
 
-          <div className="pt-3 border-t border-white/5 text-[10px] font-mono text-text-muted flex justify-between">
-            <span>ERA5 Benchmark:</span>
-            <span className="text-white font-semibold">MAE {convertTempDelta(1.12).toFixed(2)}{tempSymbol} | RMSE {convertTempDelta(1.27).toFixed(2)}{tempSymbol}</span>
-          </div>
+
         </div>
 
         {/* ECMWF AIFS · AI Model Card (Honest Null-Safety Protocol) */}
@@ -383,18 +377,12 @@ export default function ComparePage() {
               </tr>
               <tr className="hover:bg-panel-hover/30 transition-colors">
                 <td className="py-2.5 px-4 text-white font-sans font-medium">Calculated Weight</td>
-                <td className="py-2.5 px-4 text-ifs font-bold">{ifsModel ? Math.round(ifsModel.weight * 100) : 73}%</td>
-                <td className="py-2.5 px-4 text-gfs font-bold">{gfsModel ? Math.round(gfsModel.weight * 100) : 27}%</td>
+                <td className="py-2.5 px-4 text-ifs font-bold">{ifsModel ? Math.round(ifsModel.weight * 100) + '%' : "—"}</td>
+                <td className="py-2.5 px-4 text-gfs font-bold">{gfsModel ? Math.round(gfsModel.weight * 100) + '%' : "—"}</td>
                 <td className="py-2.5 px-4 text-amber-400 font-bold">0% (Excluded)</td>
                 <td className="py-2.5 px-4 text-ensemble font-bold">100% Normalized</td>
               </tr>
-              <tr className="hover:bg-panel-hover/30 transition-colors">
-                <td className="py-2.5 px-4 text-white font-sans font-medium">ERA5 Benchmark MAE</td>
-                <td className="py-2.5 px-4 text-text-secondary font-bold">{convertTempDelta(0.360).toFixed(3)}{tempSymbol}</td>
-                <td className="py-2.5 px-4 text-text-secondary font-bold">{convertTempDelta(1.119).toFixed(3)}{tempSymbol} (Warm Bias)</td>
-                <td className="py-2.5 px-4 text-text-muted">Uncalibrated</td>
-                <td className="py-2.5 px-4 text-ensemble font-bold">{convertTempDelta(0.312).toFixed(3)}{tempSymbol} (Top Performer)</td>
-              </tr>
+
             </tbody>
           </table>
         </div>

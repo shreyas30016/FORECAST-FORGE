@@ -90,6 +90,16 @@ export default function AlertsPage() {
   const windStatus = maxWind >= windThreshold ? "WARNING" : maxWind >= 45 ? "ADVISORY" : "NOMINAL";
   const precipStatus = maxPrecip >= precipThreshold ? "WARNING" : maxPrecip >= 10 ? "ADVISORY" : "NOMINAL";
 
+  const hasWarning = heatStatus === "WARNING" || windStatus === "WARNING" || precipStatus === "WARNING";
+  const hasAdvisory = heatStatus === "ADVISORY" || windStatus === "ADVISORY" || precipStatus === "ADVISORY";
+  const overallStatus = hasWarning ? "WARNING" : hasAdvisory ? "ADVISORY" : "NOMINAL";
+
+  const bannerProps = overallStatus === "WARNING" 
+    ? { border: "border-rose-500/20", bg: "bg-rose-500/[0.03]", iconBg: "bg-rose-500/15 border-rose-500/30 text-rose-400 shadow-rose-500/10", icon: <AlertCircle className="w-7 h-7" />, title: `Active Meteorological WARNINGS for ${location.name}`, dot: "bg-rose-400", desc: "Live NWP ensemble feeds indicate atmospheric parameters have exceeded critical safety margins within the 72-hour horizon.", protocol: "text-rose-400" }
+    : overallStatus === "ADVISORY"
+    ? { border: "border-amber-500/20", bg: "bg-amber-500/[0.03]", iconBg: "bg-amber-500/15 border-amber-500/30 text-amber-400 shadow-amber-500/10", icon: <AlertCircle className="w-7 h-7" />, title: `Active Meteorological ADVISORIES for ${location.name}`, dot: "bg-amber-400", desc: "Live NWP ensemble feeds indicate atmospheric parameters are approaching safety thresholds within the 72-hour horizon.", protocol: "text-amber-400" }
+    : { border: "border-emerald-500/20", bg: "bg-emerald-500/[0.03]", iconBg: "bg-emerald-500/15 border-emerald-500/30 text-emerald-400 shadow-emerald-500/10", icon: <ShieldCheck className="w-7 h-7" />, title: `No active meteorological warnings for ${location.name}`, dot: "bg-emerald-400", desc: "Live NWP ensemble feeds indicate all atmospheric parameters remain within nominal safety margins across the 72-hour horizon.", protocol: "text-emerald-400" };
+
   return (
     <div className="flex flex-col gap-6 text-slate-100 max-w-7xl mx-auto pb-12">
       
@@ -149,27 +159,27 @@ export default function AlertsPage() {
       )}
 
       {/* Main Operational Status Banner */}
-      <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] flex flex-col md:flex-row items-center justify-between gap-5 shadow-2xl relative overflow-hidden">
+      <div className={`glass-panel p-5 sm:p-6 rounded-2xl border ${bannerProps.border} ${bannerProps.bg} flex flex-col md:flex-row items-center justify-between gap-5 shadow-2xl relative overflow-hidden`}>
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0 shadow-lg shadow-emerald-500/10">
-            <ShieldCheck className="w-7 h-7" />
+          <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 shadow-lg ${bannerProps.iconBg}`}>
+            {bannerProps.icon}
           </div>
           <div className="space-y-0.5">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className={`w-2 h-2 rounded-full animate-ping ${bannerProps.dot}`} />
               <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                No active meteorological warnings for {location.name}
+                {bannerProps.title}
               </h2>
             </div>
             <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
-              Live NWP ensemble feeds indicate all atmospheric parameters remain within nominal safety margins across the 72-hour horizon.
+              {bannerProps.desc}
             </p>
           </div>
         </div>
 
         <div className="flex flex-col items-end shrink-0 border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5 text-right font-mono">
           <span className="text-[10px] uppercase tracking-wider text-slate-400">Protocol</span>
-          <span className="text-xs font-semibold text-emerald-400">WMO CAP v1.2</span>
+          <span className={`text-xs font-semibold ${bannerProps.protocol}`}>WMO CAP v1.2</span>
           <span className="text-[10px] text-slate-500">Verified thresholds</span>
         </div>
       </div>
@@ -315,7 +325,7 @@ export default function AlertsPage() {
               <div className="flex justify-between text-[11px] font-mono text-slate-400">
                 <span>Flood Risk Potential</span>
                 <span className="text-emerald-400 font-bold">
-                  {maxPrecip > 15 ? "Elevated" : "Negligible (< 5%)"}
+                  {maxPrecip > 15 ? "Elevated" : "Low"}
                 </span>
               </div>
               <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">

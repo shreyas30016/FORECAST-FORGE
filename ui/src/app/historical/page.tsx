@@ -11,11 +11,15 @@ import {
   Award, 
   CheckCircle2, 
   RefreshCw,
-  Scale
+  Scale,
+  MapPin,
+  Clock
 } from "lucide-react";
+import { useLocation } from "@/context/LocationContext";
 
 export default function HistoricalPage() {
   const { convertTempDelta, tempSymbol } = useSettings();
+  const { location } = useLocation();
   const [evaluations, setEvaluations] = useState<ModelSkillRecord[]>([]);
   const [leadTimeAvailable, setLeadTimeAvailable] = useState<boolean>(true);
   const [leadTimeNotice, setLeadTimeNotice] = useState<string | null>(null);
@@ -86,9 +90,6 @@ export default function HistoricalPage() {
                 ERA5 REANALYSIS
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-              Empirical validation of NWP models against ERA5 reanalysis reference benchmarks (192 continuous hourly samples, Mumbai NWP grid)
-            </p>
           </div>
         </div>
 
@@ -108,6 +109,38 @@ export default function HistoricalPage() {
           </div>
         </div>
       </div>
+
+      {/* PROVENANCE BANNER */}
+      <div className={`p-4 rounded-xl border flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between shadow-sm ${
+        location.name !== "Mumbai"
+          ? "bg-amber-500/10 border-amber-500/30 text-amber-200"
+          : "bg-ensemble/10 border-ensemble/30 text-emerald-200"
+      }`}>
+        <div>
+          <div className="flex items-center gap-2 text-[11px] font-mono font-bold uppercase tracking-wider mb-1">
+            {location.name !== "Mumbai" ? (
+              <><AlertCircle className="w-4 h-4 shrink-0 text-amber-400" /> REFERENCE SNAPSHOT (MUMBAI) — NOT CURRENT LOCATION</>
+            ) : (
+              <><ShieldCheck className="w-4 h-4 shrink-0 text-ensemble" /> REFERENCE VALIDATION SNAPSHOT</>
+            )}
+          </div>
+          <div className="text-xs space-y-1">
+            {location.name !== "Mumbai" && (
+              <p className="font-semibold text-amber-400">
+                You are currently viewing data for <strong>{location.name}</strong>, but this page displays a static historical benchmark for Mumbai.
+              </p>
+            )}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-mono text-[10px] opacity-80 pt-1">
+              <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> Mumbai (19.0760°N, 72.8777°E)</span>
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Historical Evaluation (192 hr)</span>
+              <span>Variable: temperature_2m</span>
+              <span>Reference: ERA5 Reanalysis</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
 
       {/* Error state */}
       {error && (
@@ -347,7 +380,7 @@ export default function HistoricalPage() {
                   <span className="w-2 h-2 rounded-full bg-ensemble shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                   <span>Inverse-Error Weighted Blend</span>
                   <span className="px-1.5 py-0.5 rounded text-[9px] font-sans font-bold bg-ensemble/20 text-ensemble border border-ensemble/40">
-                    TOP SKILL
+                    HISTORICAL REF BEST
                   </span>
                 </td>
                 <td className="py-3.5 px-3 text-slate-300 font-sans">
@@ -396,7 +429,7 @@ export default function HistoricalPage() {
               <tr className="hover:bg-white/[0.02] transition-colors">
                 <td className="py-3.5 px-3 font-bold text-white flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-slate-500" />
-                  <span>Equal-Weight Arithmetic Mean (50/50)</span>
+                  <span>Historical Equal-Weight Baseline (50/50)</span>
                 </td>
                 <td className="py-3.5 px-3 text-slate-300 font-sans">
                   Unweighted multi-model consensus baseline
@@ -433,7 +466,7 @@ export default function HistoricalPage() {
         </div>
 
         <p className="text-xs text-slate-300 leading-relaxed">
-          Empirical error metrics computed against ERA5 reanalysis over 192 continuous hourly samples. Bilinear spatial interpolation aligns the ECMWF and NOAA GFS grids.
+          Empirical error metrics computed against ERA5 reanalysis over 192 continuous hourly samples. Bilinear spatial interpolation aligns the grids.
         </p>
 
         <details className="pt-2 group border-t border-white/5">
@@ -460,7 +493,7 @@ export default function HistoricalPage() {
                 <span>Grid Parity &amp; Metrics</span>
               </div>
               <p className="text-slate-400">
-                Centroid: 19.0760°N, 72.8777°E. Bilinear interpolation ensures mathematical parity prior to error calculation.
+                Centroid: Mumbai (19.0760°N, 72.8777°E). Bilinear interpolation ensures mathematical parity prior to error calculation.
               </p>
               <div className="text-slate-300 pt-1 flex gap-2">
                 <span>MAE: Mean Absolute</span>

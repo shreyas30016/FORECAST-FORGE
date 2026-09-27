@@ -173,7 +173,7 @@ export function WeatherHero({
               <span>SPREAD</span>
             </div>
             <div className="text-sm sm:text-base font-bold text-amber-400 font-sans">
-              {displaySpread !== null ? `±${displaySpread.toFixed(1)}°` : "±0.5°"}
+              {displaySpread !== null ? `±${displaySpread.toFixed(1)}°` : "—"}
             </div>
           </div>
         </div>

@@ -82,12 +82,7 @@ async def get_ensemble(
                 )
             )
 
-    # Fallback historical weights used if dynamic adaptive weights cannot be calculated
-    # for the requested coordinates/horizon. Derived from Phase 3 global performance metrics.
-    fallback_weights = [
-        EnsembleWeight(model="ecmwf_ifs025", weight=0.73),
-        EnsembleWeight(model="gfs_seamless", weight=0.27),
-    ]
+    fallback_weights: list[EnsembleWeight] = []
 
     ensemble_res = generate_ensemble_forecast(
         location_name=name,
