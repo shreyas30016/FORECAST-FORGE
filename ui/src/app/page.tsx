@@ -259,7 +259,7 @@ export default function Dashboard() {
               : "UNAVAILABLE"
             }
             value={ifsForecast?.forecast ?? null}
-            weight={ifsForecast?.weight ?? 0}
+            weight={ifsForecast?.weight ?? null}
             precipitation={ifsRecord?.precipitation}
             windSpeed={ifsRecord?.wind_speed_10m}
             humidity={ifsRecord?.relative_humidity_2m}
@@ -276,7 +276,7 @@ export default function Dashboard() {
               : "UNAVAILABLE"
             }
             value={gfsForecast?.forecast ?? null}
-            weight={gfsForecast?.weight ?? 0}
+            weight={gfsForecast?.weight ?? null}
             precipitation={gfsRecord?.precipitation}
             windSpeed={gfsRecord?.wind_speed_10m}
             humidity={gfsRecord?.relative_humidity_2m}
@@ -289,7 +289,7 @@ export default function Dashboard() {
             provider="ECMWF Machine Learning"
             status="NO_VALID_DATA"
             value={null}
-            weight={0.0}
+            weight={null}
             skill={{}}
             reason="No valid forecast values returned for this coordinate. Zero substitution prohibited."
           />

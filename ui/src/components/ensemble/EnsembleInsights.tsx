@@ -45,7 +45,7 @@ export function EnsembleInsights({ ensemble, className = "" }: EnsembleInsightsP
         {/* Model Contributions List */}
         <div className="space-y-3">
           {Object.entries(models).map(([modelId, data]) => {
-            const wPercent = data.weight * 100;
+            const wPercent = data.weight != null ? data.weight * 100 : null;
             const isAvail = data.status.includes("AVAILABLE") && !data.status.includes("UN");
             const forecastDisplay = isAvail && data.forecast !== null ? `${convertTemp(data.forecast).toFixed(1)}${tempSymbol}` : "—";
 
@@ -66,7 +66,7 @@ export function EnsembleInsights({ ensemble, className = "" }: EnsembleInsightsP
                     </span>
                     <StatusBadge status={data.status} />
                     <span className="w-10 text-right font-bold text-white">
-                      {isAvail ? `${wPercent.toFixed(0)}%` : "0%"}
+                      {wPercent !== null ? `${wPercent.toFixed(0)}%` : "—"}
                     </span>
                   </div>
                 </div>
@@ -76,7 +76,7 @@ export function EnsembleInsights({ ensemble, className = "" }: EnsembleInsightsP
                   <div
                     className="h-full rounded-full transition-all duration-300"
                     style={{
-                      width: isAvail ? `${wPercent}%` : "0%",
+                      width: wPercent !== null && wPercent > 0 ? `${wPercent}%` : "0%",
                       backgroundColor: colors[modelId] || "#94A3B8",
                     }}
                   />

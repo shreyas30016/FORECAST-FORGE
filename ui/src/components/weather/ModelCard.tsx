@@ -12,7 +12,7 @@ interface ModelCardProps {
   status: "AVAILABLE" | "UNAVAILABLE" | "DEGRADED" | "NO_VALID_DATA";
   value: number | null;
   unit?: string;
-  weight: number;
+  weight: number | null;
   precipitation?: number | null;
   windSpeed?: number | null;
   humidity?: number | null;
@@ -98,10 +98,14 @@ export function ModelCard({
 
         <div className="text-right flex flex-col items-end gap-0.5">
           <span className={`text-2xl font-black ${isAvailable ? accentText : "text-text-muted"}`}>
-            {isAvailable ? `${Math.round(weight * 100)}%` : "0%"}
+            {weight !== null && weight !== undefined
+              ? (isAvailable ? `${Math.round(weight * 100)}%` : "0%")
+              : "—"}
           </span>
           <span className="text-[10px] uppercase tracking-wider text-text-muted font-mono">
-            {isAvailable ? "Ensemble Weight" : "Excluded"}
+            {weight !== null && weight !== undefined
+              ? (isAvailable ? "Ensemble Weight" : "Excluded")
+              : "No weight assigned"}
           </span>
         </div>
       </div>

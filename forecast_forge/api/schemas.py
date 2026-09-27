@@ -69,7 +69,7 @@ class LocationAPI(BaseModel):
 class ModelForecastAPI(BaseModel):
     status: str
     forecast: float | None
-    weight: float
+    weight: float | None
 
 
 class EnsembleMetaAPI(BaseModel):

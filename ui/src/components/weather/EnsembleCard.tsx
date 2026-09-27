@@ -30,12 +30,19 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
     : rawUncertainty;
   const models = ensemble.models || {};
 
-  const activeModels = Object.entries(models)
-    .filter(([_, m]) => m.weight > 0)
-    .sort((a, b) => b[1].weight - a[1].weight);
+  // Categorize models by weight state:
+  // 1. Contributing: AVAILABLE with weight > 0
+  // 2. Available but no weighting: AVAILABLE with weight === 0 or weight === null
+  // 3. Excluded: NO_VALID_DATA or other unavailable status
+  const contributingModels = Object.entries(models)
+    .filter(([_, m]) => (m.status === "AVAILABLE" || m.status === "DEGRADED") && m.weight !== null && m.weight > 0)
+    .sort((a, b) => (b[1].weight ?? 0) - (a[1].weight ?? 0));
 
-  const excludedModels = Object.entries(models)
-    .filter(([_, m]) => m.weight === 0 || !m.weight);
+  const availableNoWeight = Object.entries(models)
+    .filter(([_, m]) => (m.status === "AVAILABLE" || m.status === "DEGRADED") && (m.weight === null || m.weight === 0));
+
+  const unavailableModels = Object.entries(models)
+    .filter(([_, m]) => m.status !== "AVAILABLE" && m.status !== "DEGRADED");
 
   const dataQuality = ensemble.ensemble.data_quality || "HIGH";
 
@@ -68,7 +75,12 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
           </div>
           <div>
             <h3 className="text-base font-bold text-white tracking-tight">Adaptive Skill Synthesis</h3>
-            <span className="text-xs text-text-muted font-mono">Ridge-regularized inverse-error blend</span>
+            <span className="text-xs text-text-muted font-mono">
+              {ensemble.ensemble.method === "ADAPTIVE" ? "Ridge-regularized adaptive blend"
+                : ensemble.ensemble.method === "INVERSE_ERROR" ? "Inverse-error weighted blend"
+                : ensemble.ensemble.method === "EQUAL_WEIGHT" ? "Equal-weight consensus blend"
+                : "No weighted ensemble available"}
+            </span>
           </div>
         </div>
 
@@ -95,7 +107,9 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
             <span className="text-xl font-bold text-ensemble">{ensembleVal !== null ? unit : ""}</span>
           </div>
           <p className="text-[11px] font-mono text-text-muted">
-            Σ(w<sub>i</sub> × val<sub>i</sub>) · Missing values strictly excluded
+            {ensemble.ensemble.method !== "UNAVAILABLE"
+              ? "Σ(wᵢ × valᵢ) · Missing values strictly excluded"
+              : "Insufficient model data for weighted synthesis"}
           </p>
         </div>
 
@@ -124,37 +138,46 @@ export function EnsembleCard({ ensemble, className = "" }: EnsembleCardProps) {
       <div className="relative z-10 space-y-3">
         <div className="flex items-center justify-between text-xs font-mono text-text-muted">
           <span>Model Weight Distribution</span>
-          <span>Normalized over active models</span>
+          <span>{contributingModels.length > 0 ? "Normalized over contributing models" : "No weights assigned"}</span>
         </div>
 
-        <div
-          className="w-full h-2.5 rounded-full bg-background border border-white/10 flex overflow-hidden"
-          role="img"
-          aria-label="Weight Distribution"
-        >
-          {activeModels.map(([id, m]) => (
-            <div
-              key={id}
-              className={`h-full ${getModelColor(id)} transition-all duration-500 border-r border-background/20 last:border-0`}
-              style={{ width: `${m.weight * 100}%` }}
-              title={`${formatModelName(id)}: ${Math.round(m.weight * 100)}%`}
-            />
-          ))}
-        </div>
+        {contributingModels.length > 0 && (
+          <div
+            className="w-full h-2.5 rounded-full bg-background border border-white/10 flex overflow-hidden"
+            role="img"
+            aria-label="Weight Distribution"
+          >
+            {contributingModels.map(([id, m]) => (
+              <div
+                key={id}
+                className={`h-full ${getModelColor(id)} transition-all duration-500 border-r border-background/20 last:border-0`}
+                style={{ width: `${(m.weight ?? 0) * 100}%` }}
+                title={`${formatModelName(id)}: ${Math.round((m.weight ?? 0) * 100)}%`}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs font-mono">
-          {activeModels.map(([id, m]) => (
+          {contributingModels.map(([id, m]) => (
             <div key={id} className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full shrink-0 ${getModelColor(id)}`} />
               <span className="text-white">{formatModelName(id)}</span>
-              <span className="text-text-muted">({Math.round(m.weight * 100)}%)</span>
+              <span className="text-text-muted">({Math.round((m.weight ?? 0) * 100)}%)</span>
             </div>
           ))}
-          {excludedModels.map(([id, m]) => (
+          {availableNoWeight.map(([id]) => (
+            <div key={id} className="flex items-center gap-1.5 opacity-60">
+              <span className={`w-2 h-2 rounded-full shrink-0 ${getModelColor(id)}`} />
+              <span className="text-text-muted">{formatModelName(id)}</span>
+              <span className="text-slate-400 font-semibold">(Available · No current weight)</span>
+            </div>
+          ))}
+          {unavailableModels.map(([id, m]) => (
             <div key={id} className="flex items-center gap-1.5 opacity-50">
               <span className={`w-2 h-2 rounded-full shrink-0 ${getModelColor(id)}`} />
               <span className="text-text-muted">{formatModelName(id)}</span>
-              <span className="text-amber-400 font-semibold">(0% · {m.status === "NO_VALID_DATA" ? "No valid data" : m.status})</span>
+              <span className="text-amber-400 font-semibold">({m.status === "NO_VALID_DATA" ? "No valid data" : m.status})</span>
             </div>
           ))}
         </div>

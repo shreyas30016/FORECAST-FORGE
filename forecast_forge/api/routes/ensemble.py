@@ -95,8 +95,10 @@ async def get_ensemble(
 
     models_api = {}
     for mf in ensemble_res.model_forecasts:
-        # Calculate effective weight
-        w = 0.0
+        # Calculate effective weight.
+        # None = no weighting source available (unknown/unassigned).
+        # 0.0 = model was evaluated but assigned zero contribution.
+        w: float | None = None
         if ensemble_res.adaptive_weights:
             w = next((w.weight for w in ensemble_res.adaptive_weights if w.model == mf.model), 0.0)
         elif fallback_weights and mf.is_valid:
@@ -108,7 +110,7 @@ async def get_ensemble(
 
         models_api[mf.model] = ModelForecastAPI(
             status=mf.status,
-            forecast=mf.value,  # Will naturally serialize to null if None
+            forecast=mf.value,
             weight=w,
         )
 
@@ -130,9 +132,24 @@ async def get_ensemble(
     except Exception:
         pass
 
+    # Select the ensemble method and forecast based on what was actually computed.
+    # Priority: adaptive > inverse-error > equal-weight > unavailable
+    if ensemble_res.adaptive_forecast is not None:
+        selected_forecast = ensemble_res.adaptive_forecast
+        selected_method = "ADAPTIVE"
+    elif ensemble_res.inverse_error_forecast is not None:
+        selected_forecast = ensemble_res.inverse_error_forecast
+        selected_method = "INVERSE_ERROR"
+    elif ensemble_res.equal_weight_forecast is not None:
+        selected_forecast = ensemble_res.equal_weight_forecast
+        selected_method = "EQUAL_WEIGHT"
+    else:
+        selected_forecast = None
+        selected_method = "UNAVAILABLE"
+
     meta_api = EnsembleMetaAPI(
-        forecast=ensemble_res.inverse_error_forecast,  # Fallback to Phase 3 weights
-        method="INVERSE_ERROR",
+        forecast=selected_forecast,
+        method=selected_method,
         uncertainty=ensemble_res.uncertainty.spread,
         data_quality=ensemble_res.uncertainty.data_quality_indicator,
         trace_id=trace_id,

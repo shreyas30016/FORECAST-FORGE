@@ -73,7 +73,7 @@ export interface LocationAPI {
 export interface ModelForecastAPI {
   status: string;
   forecast: number | null;
-  weight: number;
+  weight: number | null;
 }
 
 export interface EnsembleMetaAPI {

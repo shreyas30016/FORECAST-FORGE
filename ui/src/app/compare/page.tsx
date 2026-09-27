@@ -200,7 +200,7 @@ export default function ComparePage() {
                 {ifsVal !== null && ifsVal !== undefined ? `${ifsVal}${tempSymbol}` : "—"}
               </span>
               <span className="text-xs font-mono text-ifs font-semibold">
-                Weight: {ifsModel ? Math.round(ifsModel.weight * 100) + '%' : "—"}
+                Weight: {ifsModel?.weight != null ? Math.round(ifsModel.weight * 100) + '%' : "—"}
               </span>
             </div>
           </div>
@@ -248,7 +248,7 @@ export default function ComparePage() {
                 {gfsVal !== null && gfsVal !== undefined ? `${gfsVal}${tempSymbol}` : "—"}
               </span>
               <span className="text-xs font-mono text-gfs font-semibold">
-                Weight: {gfsModel ? Math.round(gfsModel.weight * 100) + '%' : "—"}
+                Weight: {gfsModel?.weight != null ? Math.round(gfsModel.weight * 100) + '%' : "—"}
               </span>
             </div>
           </div>
@@ -377,8 +377,8 @@ export default function ComparePage() {
               </tr>
               <tr className="hover:bg-panel-hover/30 transition-colors">
                 <td className="py-2.5 px-4 text-white font-sans font-medium">Calculated Weight</td>
-                <td className="py-2.5 px-4 text-ifs font-bold">{ifsModel ? Math.round(ifsModel.weight * 100) + '%' : "—"}</td>
-                <td className="py-2.5 px-4 text-gfs font-bold">{gfsModel ? Math.round(gfsModel.weight * 100) + '%' : "—"}</td>
+                <td className="py-2.5 px-4 text-ifs font-bold">{ifsModel?.weight != null ? Math.round(ifsModel.weight * 100) + '%' : "—"}</td>
+                <td className="py-2.5 px-4 text-gfs font-bold">{gfsModel?.weight != null ? Math.round(gfsModel.weight * 100) + '%' : "—"}</td>
                 <td className="py-2.5 px-4 text-amber-400 font-bold">0% (Excluded)</td>
                 <td className="py-2.5 px-4 text-ensemble font-bold">100% Normalized</td>
               </tr>

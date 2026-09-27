@@ -53,14 +53,14 @@ Observed ranges at the 24h lead time:
 - **IFS Weight Range**: 0.3903 (Chennai) to 0.4304 (Mumbai) → **0.0401 range**
 - **GFS Weight Range**: 0.1348 (Delhi) to 0.2726 (Guwahati) → **0.1378 range**
 
-*Observation*: Weights display significant spatial variance, with AIFS acting as the dominant model in Delhi but being demoted behind both IFS and nearly GFS in Guwahati.
+*Observation*: Weights display measurable spatial variance under this evaluation period, with AIFS receiving the highest weight in Delhi but being assigned a lower weight than IFS in Guwahati.
 
 ## I. Blend Performance
 - Due to the parameterized reuse of `generate_exact_lead_time_evaluation`, metric output directly reflects model-specific historical performance rather than blended forecast emulation logic. Thus, the blended forecast (ensemble performance) requires downstream analysis. However, individual inverse-error assignments show structural improvements (i.e. adaptive weighting actively shifts influence to locally accurate models).
 
 ## J. Data-Availability Effects
 - All models at all 5 locations yielded exactly **720 valid matched records** (24 hours × 30 days). 
-- Thus, 100% of the observed weight variation is driven by genuine model skill differences, not missing data artifacts or varying sample sizes.
+- Thus, the observed weight variation under this evaluation is consistent with differences in measured historical model error rather than missing data artifacts or varying sample sizes.
 
 ## K. Causal-Integrity Verification
 - Causal guardrails remained fully intact. Regression tests explicitly validated that no future observations leaked into the weight generation logic (`evaluation_mode="RETROSPECTIVE"` and `"CAUSAL_OPERATIONAL"`). 
@@ -81,7 +81,7 @@ Observed ranges at the 24h lead time:
 - Single 30-day timeframe (June 2024). Variations in model dominance across locations may be further influenced by seasonal shifts (e.g., monsoon progression).
 
 ## P. Scientific Interpretation
-- The evaluation pipeline undeniably adapts to spatial variations in meteorological predictability. 
+- The evaluation pipeline demonstrates measurable adaptation to spatial variations in meteorological predictability under the evaluated period and methodology. 
 - In **Delhi**, GFS struggles immensely (RMSE 5.51), allowing AIFS (RMSE 1.61) to dominate the blend. 
 - In **Guwahati**, complex regional meteorology limits AIFS (RMSE 1.59), where IFS physically resolves the terrain better (RMSE 1.22) and even GFS becomes heavily competitive (RMSE 1.85).
 

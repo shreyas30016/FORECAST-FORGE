@@ -336,7 +336,16 @@ The final production architecture uses a split deployment:
 - **Backend**: FastAPI API deployed on **Railway**
 - **Frontend**: Next.js UI deployed on **Vercel**
 
-For step-by-step instructions on deploying the full stack, configuring CORS, and setting up environment variables, see [DEPLOYMENT.md](DEPLOYMENT.md).
+**Backend (Railway):**
+1. Connect the repository to Railway. It auto-detects Python via `pyproject.toml`.
+2. Set `NVIDIA_API_KEY` and `CORS_ALLOWED_ORIGINS` in Railway environment variables.
+3. Generate a public domain under Settings → Networking.
+4. Verify with `curl https://<your-domain>/api/v1/health`.
+
+**Frontend (Vercel):**
+1. Import the repository to Vercel with Root Directory set to `ui`.
+2. Set `NEXT_PUBLIC_API_BASE_URL` to your Railway backend URL (e.g. `https://<your-domain>/api/v1`).
+3. Deploy. The build will fail explicitly if the API URL is missing.
 
 ---
 
