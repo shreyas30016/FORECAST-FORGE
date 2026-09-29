@@ -1,0 +1,12 @@
+[variables]
+# Fix for Railway's Nixpacks builder failing to parse uv version from lockfile
+NIXPACKS_UV_VERSION = "0.11.19"
+
+[phases.install]
+# Explicitly tell Nixpacks to use the generated requirements.txt
+cmds = [
+    "python -m venv /opt/venv",
+    ". /opt/venv/bin/activate",
+    "pip install -r requirements.txt",
+    "pip install ."
+]
