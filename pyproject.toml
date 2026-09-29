@@ -64,3 +64,6 @@ indent-style = "space"
 
 # Development dependencies are declared above under [project.optional-dependencies].dev
 # and installed via: uv sync --extra dev
+
+[tool.vercel]
+entrypoint = "forecast_forge.api.app:app"
