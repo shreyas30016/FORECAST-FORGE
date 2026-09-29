@@ -10,3 +10,6 @@ cmds = [
     "pip install -r requirements.txt",
     "pip install ."
 ]
+
+[phases.setup]
+nixPkgs = ["python311"]
